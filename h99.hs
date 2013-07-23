@@ -34,8 +34,9 @@ isPalindrome xs = xs == reverse xs
 data NestedList a = Elem a | List [NestedList a]
 
 flatten :: [[a]] -> [a]
-flatten [] = []
-flatten (x:xs) = x ++ flatten xs
+-- flatten [] = []
+-- flatten (x:xs) = x ++ flatten xs
+flatten = concat
 
 compress :: Eq a => [a] -> [a]
 compress [] = []
@@ -45,8 +46,12 @@ compress (x:xs) = x : compress (nextDiff x xs)
           | x' == y = nextDiff x' ys
           | otherwise = xs
 
-span :: (a -> Bool) -> [a] -> ([a], [a])
-span _ [] = ([], [])
-span p (x:xs)
-  | p x = x : span p xs', xs')
-  | otherwise = ()
+pack :: Eq a => [a] -> [[a]]
+pack = reverse . pack' [] []
+  where pack' current acc xs =
+          case xs of
+            [] -> []
+            [x] -> (x : current) : acc
+            x : xs'@(y : _) -> if x == y
+                                 then pack' (x : current) acc xs'
+                                 else pack' [] ((x : current) : acc) xs'
