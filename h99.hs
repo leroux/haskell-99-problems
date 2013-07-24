@@ -1,6 +1,9 @@
-module H99 where
+module Main where
 
 import Prelude hiding (last, length, reverse, span)
+
+main :: IO ()
+main = undefined
 
 myLast :: [a] -> a
 myLast [] = error "last of empty list?!?"
@@ -47,11 +50,17 @@ compress (x:xs) = x : compress (nextDiff x xs)
           | otherwise = xs
 
 pack :: Eq a => [a] -> [[a]]
-pack = reverse . pack' [] []
-  where pack' current acc xs =
-          case xs of
-            [] -> []
-            [x] -> (x : current) : acc
-            x : xs'@(y : _) -> if x == y
-                                 then pack' (x : current) acc xs'
-                                 else pack' [] ((x : current) : acc) xs'
+pack (x:xs) = pack' [x] xs
+  where pack' p [] = [p]
+        pack' p (y:ys)
+          | head p == y = pack' (y : p) ys
+          | otherwise = p : pack' [y] ys
+
+encode :: Eq a => [a] -> [(Int, a)]
+encode (x:xs) = encode' 1 x xs
+  where encode' i x' [] = [(i, x')]
+        encode' i x' (y:ys)
+          | x' == y = encode' (i + 1) x' ys
+          | otherwise = (i, x') : encode' 1 y ys
+
+
